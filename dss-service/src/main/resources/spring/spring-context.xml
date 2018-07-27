@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+           http://www.springframework.org/schema/context           
+	       http://www.springframework.org/schema/context/spring-context-4.3.xsd
+	       http://www.springframework.org/schema/mvc
+	       http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+	       http://www.springframework.org/schema/task 
+           http://www.springframework.org/schema/task/spring-task-4.3.xsd
+           http://www.springframework.org/schema/tx  
+           http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop-4.3.xsd"
+	default-autowire="byType">
+
+	<!--自动注册RequestMappingHandlerMapping与RequestMappingHandlerAdapter两个Bean,这是Spring MVC为@Controller分发请求所必需的，并且提供了数据绑定支持，@NumberFormatannotation支持，@DateTimeFormat支持,@Valid支持读写XML的支持（JAXB）和读写JSON的支持（默认Jackson）等功能-->
+	<mvc:annotation-driven />
+
+	<!--扫描包路径，自动注入-->
+	<context:component-scan base-package="cn.qdcares.rpc">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<!--不包括@service注解-->
+		<!--<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" />-->
+	</context:component-scan>
+
+	<!--注解配置定时任务-->
+	<task:annotation-driven executor="myExecutor" scheduler="myScheduler" />
+	<task:executor id="myExecutor" pool-size="1" />
+	<task:scheduler id="myScheduler" pool-size="1" />
+
+	<!--注入spring上下文-->
+	<bean id="springContextsUtil" class="cn.qdcares.rpc.common.utils.SpringContextsUtil"/>
+
+
+	<!-- 读入配置属性文件 -->
+	<context:property-placeholder location="classpath:service.properties,classpath:jdbc.properties,classpath:c3p0.properties" />
+	<!--加入其它的spring配置-->
+	<import resource="classpath:spring/spring-hibernate.xml"/>
+	<import resource="classpath:spring/dubbo-provider.xml"/>
+
+
+</beans>
